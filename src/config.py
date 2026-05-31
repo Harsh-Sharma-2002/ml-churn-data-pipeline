@@ -48,5 +48,5 @@ REQUIRED_COLUMNS = [
     "Churn",
 ]
 
-# Valid target values
+
 VALID_CHURN_VALUES = {"Yes", "No"}
