@@ -13,7 +13,7 @@ def get_latest_csv_file(raw_data_dir: Path= RAW_DATA_DIR) -> Path:
     if not csv_files:
         raise FileNotFoundError(f"No csv files found in {raw_data_dir}")
     
-    latest_file = max(csv_files, key=lambda file: file.stat().st_mtime)
+    latest_file = max(csv_files, key=lambda file: file.name)
     return latest_file
 
 def load_raw_data(input_file: Optional[str] = None) -> Tuple[pd.DataFrame,Path]:
@@ -32,7 +32,7 @@ def load_raw_data(input_file: Optional[str] = None) -> Tuple[pd.DataFrame,Path]:
 
     df = pd.read_csv( selected_file)
 
-    print(f"[ingestion] Loaded raw data from the path {selected_file}")
-    print(f"[ingestion] Raw data shape: {df.shape}")
+    print(f"[INGESTION] Loaded raw data from the path {selected_file}")
+    print(f"[INGESTION] Raw data shape: {df.shape}")
 
     return df, selected_file

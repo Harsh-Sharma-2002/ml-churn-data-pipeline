@@ -1,0 +1,26 @@
+{
+    "source_file": "/Users/harshsharma/Desktop/Work_Dir/ml-churn-data-pipeline/data/raw/customer_churn_2026_05_31.csv",
+    "validation_stage": "post_clean_validation",
+    "passed": true,
+    "checks": {
+        "not_empty_after_cleaning": true,
+        "minimum_row_count": true,
+        "target_column_exists": true,
+        "target_has_no_missing_values": true,
+        "target_values_valid": true,
+        "target_has_two_classes": true,
+        "tenure_exists": true,
+        "tenure_numeric": true,
+        "tenure_non_negative": true,
+        "MonthlyCharges_exists": true,
+        "MonthlyCharges_numeric": true,
+        "MonthlyCharges_non_negative": true,
+        "TotalCharges_exists": true,
+        "TotalCharges_numeric": true,
+        "TotalCharges_non_negative": true
+    },
+    "row_count": 2040,
+    "column_count": 22,
+    "invalid_target_values": [],
+    "numeric_column_issues": {}
+}

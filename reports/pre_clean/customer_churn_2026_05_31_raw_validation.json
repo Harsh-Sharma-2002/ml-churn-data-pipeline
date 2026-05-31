@@ -1,0 +1,16 @@
+{
+    "source_file": "/Users/harshsharma/Desktop/Work_Dir/ml-churn-data-pipeline/data/raw/customer_churn_2026_05_31.csv",
+    "validation_stage": "pre_clean_raw_schema_validation",
+    "passed": true,
+    "checks": {
+        "not_empty": true,
+        "required_columns_exist": true,
+        "target_column_exists": true,
+        "target_not_all_missing": true,
+        "target_values_recognizable": true
+    },
+    "row_count": 2043,
+    "column_count": 21,
+    "missing_columns": [],
+    "invalid_target_values": []
+}
