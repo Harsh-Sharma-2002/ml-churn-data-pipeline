@@ -40,9 +40,9 @@ def split_into_daily_files(df:pd.DataFrame) -> None:
     day_2_df.to_csv(day_2_path, index=False)
     day_3_df.to_csv(day_3_path, index=False)
 
-    print(f"[DEMO DATA] Created valid Day 1 file: {day_1_path} | shape={day_1_df.shape}")
-    print(f"[DEMO DATA] Created Day 2 file before corruption: {day_2_path} | shape={day_2_df.shape}")
-    print(f"[DEMO DATA] Created valid Day 3 file: {day_3_path} | shape={day_3_df.shape}")
+    print(f"Created valid Day 1 file: {day_1_path} | shape={day_1_df.shape}")
+    print(f"Created Day 2 file before corruption: {day_2_path} | shape={day_2_df.shape}")
+    print(f"Created valid Day 3 file: {day_3_path} | shape={day_3_df.shape}")
 
 def corrupt_day_2_file() -> None:
     """
@@ -62,8 +62,8 @@ def corrupt_day_2_file() -> None:
 
     df.to_csv(day_2_path, index=False)
 
-    print(f"[DEMO DATA] Corrupted Day 2 file: {day_2_path}")
-    print("[DEMO DATA] Corruptions applied:")
+    print(f"Corrupted Day 2 file: {day_2_path}")
+    print("Corruptions applied:")
     print("  - Dropped required target column: Churn")
     print("  - Added negative MonthlyCharges values")
     print("  - Added negative tenure values")
