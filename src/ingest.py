@@ -30,9 +30,9 @@ def load_raw_data(input_file: Optional[str] = None) -> Tuple[pd.DataFrame,Path]:
     else:
         selected_file = get_latest_csv_file()
 
-        df = pd.read_csv( selected_file)
+    df = pd.read_csv( selected_file)
 
-        print(f"[ingestion] Loaded raw data from the path {selected_file}")
-        print(f"[ingestion] Raw data shape: {df.shape}")
+    print(f"[ingestion] Loaded raw data from the path {selected_file}")
+    print(f"[ingestion] Raw data shape: {df.shape}")
 
-        return df, selected_file
+    return df, selected_file

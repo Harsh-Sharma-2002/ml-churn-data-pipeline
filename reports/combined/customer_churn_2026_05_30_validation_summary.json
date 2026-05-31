@@ -1,0 +1,23 @@
+{
+    "source_file": "/Users/harshsharma/Desktop/Work_Dir/ml-churn-data-pipeline/data/raw/customer_churn_2026_05_30.csv",
+    "overall_passed": false,
+    "pre_clean_validation": {
+        "source_file": "/Users/harshsharma/Desktop/Work_Dir/ml-churn-data-pipeline/data/raw/customer_churn_2026_05_30.csv",
+        "validation_stage": "pre_clean_raw_schema_validation",
+        "passed": false,
+        "checks": {
+            "not_empty": true,
+            "required_columns_exist": false,
+            "target_column_exists": false,
+            "target_not_all_missing": false,
+            "target_values_recognizable": false
+        },
+        "row_count": 2500,
+        "column_count": 20,
+        "missing_columns": [
+            "Churn"
+        ],
+        "invalid_target_values": []
+    },
+    "post_clean_validation": null
+}
