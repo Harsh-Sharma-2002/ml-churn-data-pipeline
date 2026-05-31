@@ -3,7 +3,7 @@ import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 RAW_DATA_DIR= PROJECT_ROOT/"data"/"raw"
-SOURCE_FILE_NAME = "customer_churn_2026_05_29.csv"
+SOURCE_FILE_NAME = "customer_churn_full.csv"
 
 DAY_1_FILE="customer_churn_2026_05_29.csv"
 DAY_2_FILE="customer_churn_2026_05_30.csv"
