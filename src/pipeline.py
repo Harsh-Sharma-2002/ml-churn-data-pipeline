@@ -5,6 +5,7 @@ from typing import Optional
 from src.clean import clean_churn_data
 from src.config import PROCESSED_DATA_DIR, REJECTED_DATA_DIR
 from src.ingest import load_raw_data
+from src.state import mark_file_as_processed
 from src.train import train_churn_model
 from src.validate import (
     save_combined_validation_report,
@@ -16,12 +17,9 @@ from src.validate import (
 def build_output_path(output_dir: Path, source_file: Path, suffix: str) -> Path:
     """
     Builds an output path based on the input file name.
-
-    Example:
-        customer_churn_2026_05_29.csv
-        -> customer_churn_2026_05_29_processed.csv
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+
     return output_dir / f"{source_file.stem}_{suffix}.csv"
 
 
@@ -32,6 +30,14 @@ def run_pipeline(input_file: Optional[str] = None) -> dict:
     print("[PIPELINE] Starting churn ML data pipeline.")
 
     raw_df, source_file = load_raw_data(input_file)
+
+    if raw_df is None or source_file is None:
+        print("[PIPELINE] No new data to process.")
+        return {
+            "status": "no_new_data",
+            "source_file": None,
+            "training_triggered": False,
+        }
 
     pre_clean_report = validate_raw_schema(raw_df, source_file)
 
@@ -49,8 +55,15 @@ def run_pipeline(input_file: Optional[str] = None) -> dict:
             source_file=source_file,
         )
 
+        mark_file_as_processed(
+            source_file=source_file,
+            status="failed_pre_clean_validation",
+            training_triggered=False,
+        )
+
         print(f"[PIPELINE] Pre-clean validation failed. Rejected data saved to: {rejected_path}")
         print("[PIPELINE] Training skipped.")
+
         return {
             "status": "failed_pre_clean_validation",
             "source_file": str(source_file),
@@ -77,8 +90,15 @@ def run_pipeline(input_file: Optional[str] = None) -> dict:
         )
         clean_df.to_csv(rejected_path, index=False)
 
+        mark_file_as_processed(
+            source_file=source_file,
+            status="failed_post_clean_validation",
+            training_triggered=False,
+        )
+
         print(f"[PIPELINE] Post-clean validation failed. Rejected data saved to: {rejected_path}")
         print("[PIPELINE] Training skipped.")
+
         return {
             "status": "failed_post_clean_validation",
             "source_file": str(source_file),
@@ -97,7 +117,13 @@ def run_pipeline(input_file: Optional[str] = None) -> dict:
     print(f"[PIPELINE] Processed data saved to: {processed_path}")
     print("[PIPELINE] Validation passed. Triggering model training.")
 
-    metrics = train_churn_model(clean_df)
+    metrics = train_churn_model(clean_df, source_file)
+
+    mark_file_as_processed(
+        source_file=source_file,
+        status="success",
+        training_triggered=True,
+    )
 
     print("[PIPELINE] Pipeline completed successfully.")
 
@@ -120,7 +146,7 @@ def parse_args() -> argparse.Namespace:
         "--input-file",
         type=str,
         default=None,
-        help="Optional CSV file name inside data/raw/. If omitted, latest CSV is used.",
+        help="Optional CSV file name inside data/raw/. If omitted, next unprocessed CSV is used.",
     )
 
     return parser.parse_args()

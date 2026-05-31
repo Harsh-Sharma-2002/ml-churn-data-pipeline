@@ -129,18 +129,14 @@ def validate_clean_data(
     """
     Performs post-clean validation on the cleaned dataframe.
 
-    This is the final data-quality gate before model training.
 
     Checks:
-    - Dataset is not empty after cleaning
+    - Dataset not empty after cleaning
     - Dataset has minimum required row count
     - Target column exists
-    - Target column has no missing values
-    - Target contains only Yes/No
-    - Target has at least two classes
     - tenure is numeric and non-negative
-    - MonthlyCharges is numeric and non-negative
-    - TotalCharges is numeric and non-negative
+    - MonthlyCharges numeric and non-negative
+    - TotalCharges numeric and non-negative
     """
     checks = {}
 

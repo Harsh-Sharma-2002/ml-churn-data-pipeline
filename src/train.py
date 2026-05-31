@@ -1,5 +1,6 @@
 import json
-from typing import Dict
+from pathlib import Path
+from typing import Dict, Optional
 
 import joblib
 import pandas as pd
@@ -9,11 +10,11 @@ from sklearn.model_selection import train_test_split
 
 from src.config import (
     CUSTOMER_ID_COLUMN,
-    MODEL_PATH,
+    MODELS_DIR,
     RANDOM_STATE,
+    TRAINING_REPORTS_DIR,
     TARGET_COLUMN,
     TEST_SIZE,
-    TRAINING_METRICS_PATH,
 )
 
 
@@ -41,21 +42,52 @@ def prepare_features_and_target(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Seri
     return X, y
 
 
-def save_training_metrics(metrics: Dict[str, float]) -> None:
+def build_model_path(source_file: Optional[Path] = None) -> Path:
+    """
+    Builds a versioned model path inside models/.
+
+    Example:
+        customer_churn_2026_05_29.csv
+        -> models/customer_churn_2026_05_29_model.pkl
+    """
+    if source_file is None:
+        return MODELS_DIR / "churn_model.pkl"
+
+    return MODELS_DIR / f"{source_file.stem}_model.pkl"
+
+
+def build_metrics_path(source_file: Optional[Path] = None) -> Path:
+    """
+    Builds a metrics output path inside reports/training/.
+    """
+    if source_file is None:
+        return TRAINING_REPORTS_DIR / "training_metrics.json"
+
+    return TRAINING_REPORTS_DIR / f"{source_file.stem}_training_metrics.json"
+
+
+def save_training_metrics(
+    metrics: Dict[str, float],
+    source_file: Optional[Path] = None,
+) -> None:
     """
     Saves model evaluation metrics as JSON.
     """
-    TRAINING_METRICS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    metrics_path = build_metrics_path(source_file)
+    metrics_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(TRAINING_METRICS_PATH, "w") as file:
+    with open(metrics_path, "w") as file:
         json.dump(metrics, file, indent=4)
 
-    print(f"[TRAINING] Metrics saved to: {TRAINING_METRICS_PATH}")
+    print(f"[TRAINING] Metrics saved to: {metrics_path}")
 
 
-def train_churn_model(df: pd.DataFrame) -> Dict[str, float]:
+def train_churn_model(
+    df: pd.DataFrame,
+    source_file: Optional[Path] = None,
+) -> Dict[str, float]:
     """
-    Trains a Random Forest churn model and saves the trained model.
+    Trains a Random Forest churn model and saves a versioned model artifact.
     """
     X, y = prepare_features_and_target(df)
 
@@ -77,22 +109,26 @@ def train_churn_model(df: pd.DataFrame) -> Dict[str, float]:
 
     y_pred = model.predict(X_test)
 
+    model_path = build_model_path(source_file)
+
     metrics = {
+        "source_file": str(source_file) if source_file else None,
+        "model_path": str(model_path),
         "accuracy": round(float(accuracy_score(y_test, y_pred)), 4),
-        "precision": round(float(precision_score(y_test, y_pred)), 4),
-        "recall": round(float(recall_score(y_test, y_pred)), 4),
-        "f1_score": round(float(f1_score(y_test, y_pred)), 4),
+        "precision": round(float(precision_score(y_test, y_pred, zero_division=0)), 4),
+        "recall": round(float(recall_score(y_test, y_pred, zero_division=0)), 4),
+        "f1_score": round(float(f1_score(y_test, y_pred, zero_division=0)), 4),
         "train_rows": int(len(X_train)),
         "test_rows": int(len(X_test)),
         "feature_count": int(X.shape[1]),
     }
 
-    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(model, MODEL_PATH)
+    model_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, model_path)
 
-    print(f"[TRAINING] Model saved to: {MODEL_PATH}")
+    print(f"[TRAINING] Model saved to: {model_path}")
     print(f"[TRAINING] Metrics: {metrics}")
 
-    save_training_metrics(metrics)
+    save_training_metrics(metrics, source_file)
 
     return metrics

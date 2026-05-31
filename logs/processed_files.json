@@ -1,0 +1,25 @@
+{
+    "processed_files": [
+        {
+            "file_name": "customer_churn_2026_05_29.csv",
+            "file_path": "/Users/harshsharma/Desktop/Work_Dir/ml-churn-data-pipeline/data/raw/customer_churn_2026_05_29.csv",
+            "status": "success",
+            "training_triggered": true,
+            "processed_at_utc": "2026-05-31T08:23:33.689830+00:00"
+        },
+        {
+            "file_name": "customer_churn_2026_05_30.csv",
+            "file_path": "/Users/harshsharma/Desktop/Work_Dir/ml-churn-data-pipeline/data/raw/customer_churn_2026_05_30.csv",
+            "status": "failed_pre_clean_validation",
+            "training_triggered": false,
+            "processed_at_utc": "2026-05-31T08:23:58.579934+00:00"
+        },
+        {
+            "file_name": "customer_churn_2026_05_31.csv",
+            "file_path": "/Users/harshsharma/Desktop/Work_Dir/ml-churn-data-pipeline/data/raw/customer_churn_2026_05_31.csv",
+            "status": "success",
+            "training_triggered": true,
+            "processed_at_utc": "2026-05-31T08:24:17.485327+00:00"
+        }
+    ]
+}

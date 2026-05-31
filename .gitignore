@@ -9,3 +9,4 @@ data/rejected/*.csv
 reports/*.json
 logs/*.log
 data/
+customer_churn_full.csv

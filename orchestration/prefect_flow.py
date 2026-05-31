@@ -8,7 +8,9 @@ from src.pipeline import run_pipeline
 @task(name="Run churn ETL validation and training pipeline")
 def run_pipeline_task(input_file: Optional[str] = None) -> dict:
     """
-    Runs the full churn data pipeline as a Prefect task.
+    Runs one pipeline attempt.
+
+    If no unprocessed CSV exists, the pipeline returns no_new_data.
     """
     return run_pipeline(input_file=input_file)
 
@@ -18,14 +20,14 @@ def churn_pipeline_flow(input_file: Optional[str] = None) -> dict:
     """
     Prefect flow for the churn ML data pipeline.
 
-    The flow can be run manually for a specific file, or scheduled daily
-    to automatically ingest the latest CSV from data/raw/.
+    taking 20 sec day for simulation
     """
     result = run_pipeline_task(input_file=input_file)
     return result
 
 
 if __name__ == "__main__":
-    # Manual run for local development.
-    # If input_file=None, the pipeline picks the latest CSV from data/raw/.
-    churn_pipeline_flow()
+    churn_pipeline_flow.serve(
+        name="churn-pipeline-20-second-demo-schedule",
+        interval=20, # 86400 for day
+    )

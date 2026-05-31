@@ -1,74 +1,93 @@
-from pathlib import Path
 import pandas as pd
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-RAW_DATA_DIR= PROJECT_ROOT/"data"/"raw"
-SOURCE_FILE_NAME = "customer_churn_full.csv"
+from src.config import (
+    DAY_1_FILE,
+    DAY_2_FILE,
+    DAY_3_FILE,
+    DEMO_DAILY_FILES_DIR,
+    RAW_DATA_DIR,
+    SOURCE_DATA_PATH,
+)
 
-DAY_1_FILE="customer_churn_2026_05_29.csv"
-DAY_2_FILE="customer_churn_2026_05_30.csv"
-DAY_3_FILE="customer_churn_2026_05_31.csv"
 
 def load_source_data() -> pd.DataFrame:
-    source_path = RAW_DATA_DIR/SOURCE_FILE_NAME
+    if not SOURCE_DATA_PATH.exists():
+        raise FileNotFoundError(
+            f"Source file not found: {SOURCE_DATA_PATH}. "
+            "Expected customer_churn_full.csv in the project root."
+        )
 
-    if not source_path.exists():
-        raise FileNotFoundError(f"file with name {source_path} not found")
-    df = pd.read_csv(source_path)
-    print(f"demo data created with source file: {source_path} with shape of {df.shape}")
+    df = pd.read_csv(SOURCE_DATA_PATH)
+
+    print(f"[DEMO DATA] Loaded source file: {SOURCE_DATA_PATH}")
+    print(f"[DEMO DATA] Source shape: {df.shape}")
 
     return df
 
 
-
-def split_into_daily_files(df:pd.DataFrame) -> None:
+def clear_demo_dirs() -> None:
     """
-    Splits data frame into daily based data files 
+    Clears generated demo files and active raw files.
     """
-
+    DEMO_DAILY_FILES_DIR.mkdir(parents=True, exist_ok=True)
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+    for csv_file in DEMO_DAILY_FILES_DIR.glob("*.csv"):
+        csv_file.unlink()
+
+    for csv_file in RAW_DATA_DIR.glob("*.csv"):
+        csv_file.unlink()
+
+    print("[DEMO DATA] Cleared data/demo_daily_files/ and data/raw/ CSV files.")
+
+
+def split_into_daily_files(df: pd.DataFrame) -> None:
+    """
+    Splits the source dataframe into three staged daily files.
+    """
     day_1_df = df.iloc[:2500].copy()
     day_2_df = df.iloc[2500:5000].copy()
     day_3_df = df.iloc[5000:].copy()
 
-    day_1_path = RAW_DATA_DIR / DAY_1_FILE
-    day_2_path = RAW_DATA_DIR / DAY_2_FILE
-    day_3_path = RAW_DATA_DIR / DAY_3_FILE
+    day_1_df.to_csv(DEMO_DAILY_FILES_DIR / DAY_1_FILE, index=False)
+    day_2_df.to_csv(DEMO_DAILY_FILES_DIR / DAY_2_FILE, index=False)
+    day_3_df.to_csv(DEMO_DAILY_FILES_DIR / DAY_3_FILE, index=False)
 
-    day_1_df.to_csv(day_1_path, index=False)
-    day_2_df.to_csv(day_2_path, index=False)
-    day_3_df.to_csv(day_3_path, index=False)
+    print(f"[DEMO DATA] Created valid Day 1 file: {DAY_1_FILE}")
+    print(f"[DEMO DATA] Created Day 2 file before corruption: {DAY_2_FILE}")
+    print(f"[DEMO DATA] Created valid Day 3 file: {DAY_3_FILE}")
 
-    print(f"Created valid Day 1 file: {day_1_path} | shape={day_1_df.shape}")
-    print(f"Created Day 2 file before corruption: {day_2_path} | shape={day_2_df.shape}")
-    print(f"Created valid Day 3 file: {day_3_path} | shape={day_3_df.shape}")
 
 def corrupt_day_2_file() -> None:
     """
-    intentionally curruptind day 2 file to to test validation logic 
+    Intentionally corrupts Day 2 to test validation failure.
     """
-
-    day_2_path = RAW_DATA_DIR/DAY_2_FILE
+    day_2_path = DEMO_DAILY_FILES_DIR / DAY_2_FILE
 
     if not day_2_path.exists():
-        raise FileNotFoundError(f"File with path: {day_2_path}  not found")
-    
+        raise FileNotFoundError(f"Day 2 file not found: {day_2_path}")
+
     df = pd.read_csv(day_2_path)
 
-    df.loc[df.index[:10], "MonthlyCharges"] = -999
-    df.loc[df.index[10:20], "tenure"] = -5
-    df = df.drop(columns=["Churn"])
+    if "MonthlyCharges" in df.columns:
+        df.loc[df.index[:10], "MonthlyCharges"] = -999
+
+    if "tenure" in df.columns:
+        df.loc[df.index[10:20], "tenure"] = -5
+
+    if "Churn" in df.columns:
+        df = df.drop(columns=["Churn"])
 
     df.to_csv(day_2_path, index=False)
 
-    print(f"Corrupted Day 2 file: {day_2_path}")
-    print("Corruptions applied:")
+    print("[DEMO DATA] Corrupted Day 2 file:")
     print("  - Dropped required target column: Churn")
     print("  - Added negative MonthlyCharges values")
     print("  - Added negative tenure values")
 
+
 def main() -> None:
+    clear_demo_dirs()
     df = load_source_data()
     split_into_daily_files(df)
     corrupt_day_2_file()

@@ -1,39 +1,44 @@
 from pathlib import Path
 
 
-# Project root
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-# Data directories
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
+DEMO_DAILY_FILES_DIR = DATA_DIR / "demo_daily_files"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 REJECTED_DATA_DIR = DATA_DIR / "rejected"
 
-# Output directories
 MODELS_DIR = PROJECT_ROOT / "models"
 REPORTS_DIR = PROJECT_ROOT / "reports"
 LOGS_DIR = PROJECT_ROOT / "logs"
 
-# Validation report directories
 PRE_CLEAN_REPORTS_DIR = REPORTS_DIR / "pre_clean"
 POST_CLEAN_REPORTS_DIR = REPORTS_DIR / "post_clean"
 COMBINED_REPORTS_DIR = REPORTS_DIR / "combined"
+TRAINING_REPORTS_DIR = REPORTS_DIR / "training"
 
-# Output files
-PROCESSED_DATA_PATH = PROCESSED_DATA_DIR / "processed_churn.csv"
-REJECTED_DATA_PATH = REJECTED_DATA_DIR / "rejected_churn.csv"
-TRAINING_METRICS_PATH = REPORTS_DIR / "training_metrics.json"
+SOURCE_DATA_PATH = PROJECT_ROOT / "customer_churn_full.csv"
+PROCESSED_MANIFEST_PATH = LOGS_DIR / "processed_files.json"
+
 MODEL_PATH = MODELS_DIR / "churn_model.pkl"
 
-# ML settings
 TARGET_COLUMN = "Churn"
 CUSTOMER_ID_COLUMN = "customerID"
 MINIMUM_ROW_COUNT = 100
 RANDOM_STATE = 42
 TEST_SIZE = 0.2
 
-# Expected schema for raw customer churn CSV files
+DAY_1_FILE = "customer_churn_2026_05_29.csv"
+DAY_2_FILE = "customer_churn_2026_05_30.csv"
+DAY_3_FILE = "customer_churn_2026_05_31.csv"
+
+DEMO_FILES = [
+    DAY_1_FILE,
+    DAY_2_FILE,
+    DAY_3_FILE,
+]
+
 REQUIRED_COLUMNS = [
     "customerID",
     "gender",
@@ -58,5 +63,4 @@ REQUIRED_COLUMNS = [
     "Churn",
 ]
 
-# Valid target values
 VALID_CHURN_VALUES = {"Yes", "No"}
